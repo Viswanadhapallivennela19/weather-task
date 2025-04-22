@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<title>Weather App</title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+		#parent{
+			width: 80%;
+			border-radius: .5rem;
+			padding: 1rem;
+			background-color: lightblue;
+			margin:auto;
+		}
+		form{
+			width:50%;
+			display: flex;
+			justify-content:center;
+			align-items: center;
+			background-color: aliceblue;
+			box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.13);
+			padding:.5rem;
+			border-radius: 1rem;
+			margin: auto;
+		}
+		form input{
+			padding: .7rem;
+			width: 87%;
+			border-radius: 2rem;
+			background: none;
+			border: none;
+		}
+		button{
+			border: none;
+			display:flex;
+			justify-content: center;
+			align-items: center;
+			background:lightgray;
+			padding:.5rem;
+			border-radius: 50%;
+		}
+		.div{
+			width: 100%;
+			max-height: 100vh;
+			
+			/* border: 2px solid red; */
+		}
+		button:hover{
+			background: lightcoral;
+			transition:all 0.5s ease-in-out;
+		}
+		.info-parent{
+			height: 100vh;
+			width: 100%;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			background-color: rgba(0, 0, 0, 0.676);
+			top:0;
+			position:absolute;
+			z-index: 100;
+		}
+		.info{
+			width: 40%;
+			height: 200px;
+			background-color:lightblue;
+			padding: 1rem;
+			box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.185);
+			border-radius: 1rem;
+		}
+		 .icon-style{
+			width: 100%;
+			text-align: end;
+		 }
+		 .icon-style:hover{
+			 color:red;
+			 font-weight: 800;
+			 cursor: pointer;
+			text-shadow: 2px 2px rgba(0, 0, 0, 0.331);
+		 }
+		 #status{
+			 font-weight: 700;
+			 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		 }
+		 .status-parent{
+			width: 100%;
+			height:90%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		 }
+		 #temp{
+			 text-align: center;
+			margin:1rem auto;
+			width: 40%;
+			height: 200px;
+			padding: .5rem;
+			box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.203);
+			border-radius: 1rem;
+			display: flex;
+			gap: .3rem;
+			flex-direction: column;
+			align-content: center;
+			justify-content: center;
+		 }
+	</style>
+</head>
+<body>
+	<div class="div">
+	<div id="parent">
+		<form action="" id="form">
+			<input type="text" placeholder="Enter a City" id="city-val">
+			<button type="submit"><i class="material-icons">search</i></button>
+		</form>
+		<div id="temp">
+			 
+		</div>
+		
+	</div>
+	<div class="info-parent" id="info-parent">
+		<div id="info" class="info">
+			<i class="material-icons icon-style" onclick=cross()>close</i>
+			<div class="status-parent">
+				<p id="status"></p>
+			</div>
+			
+		</div>
+	</div>
+</div>
+	<script>
+		let info=document.getElementById('info-parent')
+		let status=document.getElementById('status')
+		let temp_info=document.getElementById('temp')
+		async function Temp(e){
+			e.preventDefault()
+			let city=document.getElementById('city-val').value.trim().toLowerCase()
+			if(!city){
+				info.style.display='flex'
+				status.innerHTML="Please Enter valid City Name"
+				return
+			}	
+			try{
+				console.log(city)
+				let res=await fetch(`https://wttr.in/${city}?format=j2`);
+				if(!res.ok){
+					info.style.display='flex'
+					status.innerHTML="Weather data not found. Try another city"
+					return
+				}
+				let data=await res.json()
+				console.log(data)
+				console.log(data.current_condition[0].temp_C)
+				temp_info.innerHTML=`
+				<h2 style='color:white;letter-spacing:.2rem;'>${data.nearest_area[0]?.areaName[0]?.value}<h2>
+				<h4><i class="material-icons" style='color:orange;'>device_thermostat</i>Temperature : ${data.current_condition[0]?.temp_C}<sup>°C</sup></h4>
+				<h4>Description : ${data.current_condition[0]?.weatherDesc[0]?.value}</h4>
+				`
+			}
+			catch(err){
+				console.log(err)
+				info.style.display='flex'
+				status.innerHTML=err.message || "Something went wrong"
+				console.log(err)
+			}
+			
+		}
+		document.getElementById('form').addEventListener('submit',Temp)
+		function cross(){
+			info.style.display='none'
+		}
+	</script>
+</body>
+</html>
